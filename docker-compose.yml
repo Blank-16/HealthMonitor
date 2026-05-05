@@ -5,6 +5,11 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - monitoring
 
@@ -18,7 +23,13 @@ services:
       - MONITOR_INTERVAL=60000
       - URLS_TO_MONITOR=https://google.com,https://github.com,https://openai.com
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - monitoring
 
@@ -27,7 +38,8 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     networks:
       - monitoring
 
