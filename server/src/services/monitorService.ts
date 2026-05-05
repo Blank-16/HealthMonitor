@@ -7,36 +7,37 @@ const pingUrl = async (url: string): Promise<HealthStatus> => {
   const start = Date.now();
   try {
     await axios.get(url, { timeout: 10000 });
-    const latency = Date.now() - start;
     return {
       url,
       status: 'up',
-      latency,
+      latency: Date.now() - start,
       lastChecked: new Date().toISOString(),
     };
-  } catch (error) {
-    const latency = Date.now() - start;
+  } catch {
     return {
       url,
       status: 'down',
-      latency,
+      latency: Date.now() - start,
       lastChecked: new Date().toISOString(),
     };
   }
 };
 
 export const startMonitoring = () => {
-  const urls = process.env.URLS_TO_MONITOR?.split(',') || [];
+  const urls = process.env.URLS_TO_MONITOR?.split(',').map(u => u.trim()) || [];
   const interval = parseInt(process.env.MONITOR_INTERVAL || '60000', 10);
 
   logger.info(`Starting monitoring for ${urls.length} URLs every ${interval}ms`);
 
   const runPings = async () => {
-    for (const url of urls) {
-      const status = await pingUrl(url.trim());
-      await saveStatus(status);
-      logger.info(`Checked ${url}: ${status.status} (${status.latency}ms)`);
-    }
+    await Promise.all(
+      urls.map(url =>
+        pingUrl(url).then(async status => {
+          await saveStatus(status);
+          logger.info(`Checked ${url}: ${status.status} (${status.latency}ms)`);
+        })
+      )
+    );
   };
 
   runPings();

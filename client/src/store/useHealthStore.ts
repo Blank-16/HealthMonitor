@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import axios from 'axios';
-import { HealthStatus } from '../types';
+import type { HealthStatus } from '../types';
 import { toast } from 'sonner';
 
 interface HealthState {
@@ -11,7 +11,7 @@ interface HealthState {
   fetchData: () => Promise<void>;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/status';
+const API_URL = import.meta.env.VITE_API_URL || '/api/status';
 
 export const useHealthStore = create<HealthState>()(
   immer((set, get) => ({
@@ -24,11 +24,10 @@ export const useHealthStore = create<HealthState>()(
         const newData = response.data;
         const oldData = get().data;
 
-        // Check for status changes to show toasts
         if (oldData.length > 0) {
           newData.forEach((service) => {
-            const prevService = oldData.find((s) => s.url === service.url);
-            if (prevService && prevService.status !== service.status) {
+            const prev = oldData.find((s) => s.url === service.url);
+            if (prev && prev.status !== service.status) {
               if (service.status === 'up') {
                 toast.success(`${service.url} is back online`, {
                   description: `Operational with ${service.latency}ms latency`,
@@ -47,12 +46,12 @@ export const useHealthStore = create<HealthState>()(
           state.error = null;
           state.loading = false;
         });
-      } catch (err) {
+      } catch {
         set((state) => {
           state.error = 'Failed to fetch health status';
           state.loading = false;
         });
-        console.error(err);
+        // error intentionally suppressed; user-facing error set in state
       }
     },
   }))

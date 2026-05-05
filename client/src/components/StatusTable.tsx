@@ -1,6 +1,6 @@
 import React from 'react';
 import { Activity, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { HealthStatus } from '../types';
+import type { HealthStatus } from '../types';
 
 interface StatusTableProps {
   data: HealthStatus[];

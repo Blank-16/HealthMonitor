@@ -19,15 +19,10 @@ export const connectRedis = async () => {
 };
 
 export const saveStatus = async (status: HealthStatus) => {
-  await connectRedis();
   await client.hSet('health_status', status.url, JSON.stringify(status));
 };
 
 export const getAllStatuses = async (): Promise<HealthStatus[]> => {
-  await connectRedis();
   const statuses = await client.hGetAll('health_status');
-  return Object.values(statuses).map((s) => {
-    const parsed = JSON.parse(s);
-    return HealthStatusSchema.parse(parsed); // Validates schema
-  });
+  return Object.values(statuses).map(s => HealthStatusSchema.parse(JSON.parse(s)));
 };
