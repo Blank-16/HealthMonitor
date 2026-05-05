@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { globalErrorHandler } from './middleware/errorHandler';
 import { connectRedis, getAllStatuses } from './services/redisService';
 import { startMonitoring } from './services/monitorService';
+import { logger } from './services/loggerService';
 
 dotenv.config();
 
@@ -33,10 +34,10 @@ const startServer = async () => {
     await connectRedis();
     startMonitoring();
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      logger.info(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error);
     process.exit(1);
   }
 };

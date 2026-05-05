@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { saveStatus } from './redisService';
 import { HealthStatus } from '../types';
+import { logger } from './loggerService';
 
 const pingUrl = async (url: string): Promise<HealthStatus> => {
   const start = Date.now();
@@ -28,16 +29,16 @@ export const startMonitoring = () => {
   const urls = process.env.URLS_TO_MONITOR?.split(',') || [];
   const interval = parseInt(process.env.MONITOR_INTERVAL || '60000', 10);
 
-  console.log(`Starting monitoring for ${urls.length} URLs every ${interval}ms`);
+  logger.info(`Starting monitoring for ${urls.length} URLs every ${interval}ms`);
 
   const runPings = async () => {
     for (const url of urls) {
       const status = await pingUrl(url.trim());
       await saveStatus(status);
-      console.log(`Checked ${url}: ${status.status} (${status.latency}ms)`);
+      logger.info(`Checked ${url}: ${status.status} (${status.latency}ms)`);
     }
   };
 
-  runPings(); // Run once immediately
+  runPings();
   setInterval(runPings, interval);
 };
