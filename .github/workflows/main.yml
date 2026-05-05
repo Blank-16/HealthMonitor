@@ -1,0 +1,46 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Lint Server
+        run: |
+          cd server
+          npm install
+          npm run build
+          
+      - name: Lint Client
+        run: |
+          cd client
+          npm install
+          npm run build
+
+  build-images:
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: actions/setup-docker-action@v1 # Placeholder for actual docker build steps
+        
+      - name: Build Server Image
+        run: docker build -t healthmonitor-server ./server
+        
+      - name: Build Client Image
+        run: docker build -t healthmonitor-client ./client
