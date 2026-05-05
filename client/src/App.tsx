@@ -14,7 +14,7 @@ function App() {
               <Shield className="text-emerald-500" size={32} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Sentinel-TS</h1>
+              <h1 className="text-2xl font-bold text-white tracking-tight">HealthMonitor</h1>
               <p className="text-neutral-500 text-sm">Enterprise Health Monitoring</p>
             </div>
           </div>
@@ -66,7 +66,7 @@ function App() {
         </main>
 
         <footer className="mt-24 pt-8 border-t border-neutral-900 text-center text-neutral-600 text-sm">
-          <p>© 2026 Sentinel-TS • High Availability Monitoring</p>
+          <p>© 2026 HealthMonitor • High Availability Monitoring</p>
         </footer>
       </div>
     </div>

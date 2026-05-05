@@ -1,4 +1,4 @@
-# Sentinel-TS
+# HealthMonitor
 
 Enterprise-grade health monitoring system with a decoupled architecture.
 
