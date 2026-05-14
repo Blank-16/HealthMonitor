@@ -1,12 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { globalErrorHandler } from './middleware/errorHandler';
 import { connectRedis, getAllStatuses } from './services/redisService';
-import { startMonitoring } from './services/monitorService';
+import { startMonitoring, triggerManualRefresh } from './services/monitorService';
 import { logger } from './services/loggerService';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +21,15 @@ app.get('/health', (req, res) => {
 app.get('/api/status', async (req, res, next) => {
   try {
     const statuses = await getAllStatuses();
+    res.json(statuses);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/refresh', async (req, res, next) => {
+  try {
+    const statuses = await triggerManualRefresh();
     res.json(statuses);
   } catch (error) {
     next(error);

@@ -24,5 +24,14 @@ export const saveStatus = async (status: HealthStatus) => {
 
 export const getAllStatuses = async (): Promise<HealthStatus[]> => {
   const statuses = await client.hGetAll('health_status');
-  return Object.values(statuses).map(s => HealthStatusSchema.parse(JSON.parse(s)));
+  return Object.values(statuses)
+    .map((s) => {
+      try {
+        return HealthStatusSchema.parse(JSON.parse(s));
+      } catch (error) {
+        logger.error(`Failed to parse status from Redis: ${s}`, error);
+        return null;
+      }
+    })
+    .filter((s): s is HealthStatus => s !== null);
 };
