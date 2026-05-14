@@ -10,17 +10,21 @@ services:
       - monitoring
 
   server:
-    build: ./server
+    build: 
+      context: ./server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./server:/app
+      - /app/node_modules
     ports:
       - "5000:5000"
     environment:
       - REDIS_URL=redis://redis:6379
       - PORT=5000
       - MONITOR_INTERVAL=60000
-      - URLS_TO_MONITOR=https://google.com,https://github.com,https://openai.com
+      - URLS_TO_MONITOR=https://google.com,https://github.com,https://openai.com,https://microsoft.com,https://apple.com,https://amazon.com,https://netflix.com,https://spotify.com,https://x.com,https://linkedin.com
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
       interval: 10s
@@ -30,12 +34,18 @@ services:
       - monitoring
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./client:/app
+      - /app/node_modules
     ports:
-      - "3000:80"
+      - "3000:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api/status
     depends_on:
-      server:
-        condition: service_healthy
+      - server
     networks:
       - monitoring
 
