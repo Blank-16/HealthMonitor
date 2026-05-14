@@ -19,6 +19,9 @@ export const useHealthStore = create<HealthState>()(
     loading: true,
     error: null,
     fetchData: async () => {
+      set((state) => {
+        state.loading = true;
+      });
       try {
         const response = await axios.get<HealthStatus[]>(API_URL);
         const newData = response.data;
