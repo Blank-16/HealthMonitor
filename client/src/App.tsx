@@ -1,6 +1,6 @@
 import { useHealthStatus } from './hooks/useHealthStatus';
 import { StatusTable } from './components/StatusTable';
-import { Shield, RefreshCw } from 'lucide-react';
+import { Shield, RefreshCw, XCircle } from 'lucide-react';
 
 function App() {
   const { data, loading, error, refetch } = useHealthStatus();
@@ -34,13 +34,20 @@ function App() {
               <RefreshCw className="animate-spin mb-4" size={48} />
               <p>Initializing monitors...</p>
             </div>
-          ) : error ? (
-            <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-500">
-              <p className="font-medium">Error: {error}</p>
-              <p className="text-sm mt-1">Make sure the backend server is running and accessible.</p>
-            </div>
           ) : (
             <div className="space-y-6">
+              {error && (
+                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-500 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <XCircle size={20} />
+                    <div>
+                      <p className="font-medium text-sm">Connection Error</p>
+                      <p className="text-xs opacity-80">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/50">
                   <p className="text-neutral-500 text-sm mb-1">Total Services</p>

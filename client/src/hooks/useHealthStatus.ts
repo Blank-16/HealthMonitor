@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useHealthStore } from '../store/useHealthStore';
 
 export const useHealthStatus = () => {
-  const { data, loading, error, fetchData } = useHealthStore();
+  const { data, loading, error, fetchData, refreshData } = useHealthStore();
 
   useEffect(() => {
     fetchData();
@@ -10,5 +10,5 @@ export const useHealthStatus = () => {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, loading, error, refetch: refreshData };
 };

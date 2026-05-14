@@ -9,9 +9,11 @@ interface HealthState {
   loading: boolean;
   error: string | null;
   fetchData: () => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || '/api/status';
+const REFRESH_URL = API_URL.replace('/status', '/refresh');
 
 export const useHealthStore = create<HealthState>()(
   immer((set, get) => ({
@@ -54,7 +56,32 @@ export const useHealthStore = create<HealthState>()(
           state.error = 'Failed to fetch health status';
           state.loading = false;
         });
-        // error intentionally suppressed; user-facing error set in state
+      }
+    },
+    refreshData: async () => {
+      set((state) => {
+        state.loading = true;
+      });
+      try {
+        const response = await axios.post<HealthStatus[]>(REFRESH_URL);
+        const newData = response.data;
+
+        set((state) => {
+          state.data = newData;
+          state.error = null;
+          state.loading = false;
+        });
+        toast.success('Refresh complete', {
+          description: 'All services have been re-checked',
+        });
+      } catch {
+        set((state) => {
+          state.error = 'Failed to refresh health status';
+          state.loading = false;
+        });
+        toast.error('Refresh failed', {
+          description: 'Could not trigger manual update',
+        });
       }
     },
   }))
