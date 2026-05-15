@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables (sensitive data)
+.env
+.env.local
+.env.*.local
+
+# Optional IDE/cache files
+.eslintcache
+.node_repl_history
+.npm   
